@@ -23,6 +23,10 @@ To release a new version (e.g. from `1.0.0` -> `2.0.0`):
 
 ## [Unreleased]
 
+* Constructing an `intN` scalar or array element from a Python `float` now
+  truncates toward zero before the range check, so `int4(7.5)` is `7` and
+  `uint4(-0.5)` is `0` instead of raising `OverflowError`, as already happened
+  for `np.float32` and `np.float16` inputs.
 * Casts to `float8_e8m0fnu` now round values between 2<sup>-127</sup> and
   1.5 × 2<sup>-127</sup> down to 2<sup>-127</sup> instead of up to
   2<sup>-126</sup>

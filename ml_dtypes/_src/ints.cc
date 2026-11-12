@@ -110,6 +110,9 @@ bool CastToIntN(PyObject* arg, T* output) {
                       "cannot convert float infinity to integer");
       return false;
     }
+    // Truncate toward zero before the range check, like int() and the NumPy
+    // scalar paths below, so that e.g. int4(7.5) is 7.
+    d = std::trunc(d);
     if (d < static_cast<double>(T::lowest()) ||
         d > static_cast<double>(T::highest())) {
       PyErr_SetString(PyExc_OverflowError, kOutOfRange);

@@ -219,6 +219,21 @@ class ScalarTest(parameterized.TestCase):
       np.array(np.inf).astype(scalar_type)
       np.array(1e10).astype(scalar_type)
 
+  @parameterized.product(scalar_type=INTN_TYPES)
+  def testCastFromFloatTruncates(self, scalar_type):
+    info = ml_dtypes.iinfo(scalar_type)
+    for value in (info.min - 0.5, info.max + 0.5):
+      expected = int(value)
+      for cast in (float, np.float64, np.float32, np.float16):
+        self.assertEqual(int(scalar_type(cast(value))), expected)
+        self.assertEqual(
+            int(np.array(cast(value), dtype=scalar_type)), expected
+        )
+    with self.assertRaises(OverflowError):
+      scalar_type(float(info.min - 1))
+    with self.assertRaises(OverflowError):
+      scalar_type(float(info.max + 1))
+
   _INCOMPATIBLE_VALUES = [
       None,
       "string",
