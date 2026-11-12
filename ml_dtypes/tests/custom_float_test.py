@@ -468,6 +468,20 @@ class CustomFloatTest(parameterized.TestCase):
       if dtype_is_signed(float_type):
         self.assertEqual(-v, int(float_type(-v)))
 
+  def testIntMatchesPythonFloat(self, float_type):
+    big = ml_dtypes.finfo(float_type).max
+    self.assertEqual(int(float(big)), int(big))
+    if dtype_is_signed(float_type):
+      self.assertEqual(int(float(-big)), int(-big))
+    if dtype_has_inf(float_type):
+      with self.assertRaises(OverflowError):
+        int(float_type(float("inf")))
+      with self.assertRaises(OverflowError):
+        int(float_type(float("-inf")))
+    if dtype_has_nan(float_type):
+      with self.assertRaises(ValueError):
+        int(float_type(float("nan")))
+
   @ignore_warning(category=RuntimeWarning, message="overflow encountered")
   def testRoundTripToNumpy(self, float_type):
     for dtype in [

@@ -139,6 +139,14 @@ def test_float_and_int_conversion(sctype):
     assert float(z) == 1.5
   with pytest.warns(ComplexWarning):
     assert int(z) == 1
+  z = sctype(complex(np.inf, 0))
+  with pytest.warns(ComplexWarning):
+    with pytest.raises(OverflowError):
+      int(z)
+  z = sctype(complex(np.nan, 0))
+  with pytest.warns(ComplexWarning):
+    with pytest.raises(ValueError):
+      int(z)
 
 
 @pytest.mark.parametrize("sctype", COMPLEX_SCTYPES)
